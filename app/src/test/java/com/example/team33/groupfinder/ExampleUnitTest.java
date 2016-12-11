@@ -1,4 +1,4 @@
-package com.example.team33.storyfinder;
+package com.example.team33.groupfinder;
 
 import org.junit.Test;
 

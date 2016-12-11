@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Story Finder</string>
+    <string name="app_name">Group Finder</string>
     <string name="search_hint">Search (eg. Pizza)</string>
     <string name="search_button">Search</string>
     <string name="empty_string"></string>
