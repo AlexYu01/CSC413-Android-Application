@@ -1,4 +1,4 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.adapter;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.example.team33.groupfinder.app.App;
+import com.example.team33.groupfinder.model.Group;
+import com.example.team33.groupfinder.R;
+import com.example.team33.groupfinder.volley.VolleySingleton;
 
 import java.util.List;
 
@@ -18,46 +22,51 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Movie> movieList;
+    private static List<Group> mGroupList;
     private OnClickListener listener;
 
-    public RecyclerViewAdapter(List<Movie> movieList) {
-        this.movieList = movieList;
+    public RecyclerViewAdapter(List<Group> groupList) {
+        this.mGroupList = groupList;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.movie_card_layout, parent, false);
+                .inflate(R.layout.group_card_layout, parent, false);
         return new CardViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Movie movie = movieList.get(position);
+        Group group = mGroupList.get(position);
 
         CardViewHolder cardViewHolder = (CardViewHolder) holder;
-        cardViewHolder.setTitle(movie.getTitle());
-        cardViewHolder.setYear(movie.getYear());
-        cardViewHolder.setPosterUrl(movie.getPosterUrl());
-        if(listener!=null) {
-            cardViewHolder.bindClickListener(listener, movie);
+        cardViewHolder.setName(group.getName());
+        cardViewHolder.setMemberCount(group.getMemberCount(), group.getWho());
+        cardViewHolder.setPhotoUrl(group.getGroupPhotoUrl());
+        if (listener != null) {
+            cardViewHolder.bindClickListener(listener, group);
         }
     }
 
     @Override
     public int getItemCount() {
-        return movieList.size();
+        return mGroupList.size();
+    }
+
+    public static List<Group> getGroupList() {
+        return mGroupList;
     }
 
     /**
-     * Removes older data from movieList and update it.
+     * Removes older data from mGroupList and update it.
      * Once the data is updated, notifies RecyclerViewAdapter.
-     * @param modelList list of movies
+     *
+     * @param modelList list of groups
      */
-    public void updateDataSet(List<Movie> modelList) {
-        this.movieList.clear();
-        this.movieList.addAll(modelList);
+    public void updateDataSet(List<Group> modelList) {
+        this.mGroupList.clear();
+        this.mGroupList.addAll(modelList);
         notifyDataSetChanged();
     }
 
@@ -66,80 +75,84 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public interface OnClickListener {
-        void onCardClick(Movie movie);
-        void onPosterClick(Movie movie);
+        void onCardClick(Group group);
+
+        //void onPosterClick(Group group);
     }
 
     /**
-     *  CardViewHolder will hold the layout of the each item in the RecyclerView.
+     * CardViewHolder will hold the layout of the each item in the RecyclerView.
      */
     private class CardViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardView;
-        private TextView title;
-        private TextView year;
+        private TextView name;
+        private TextView memberCount;
         private NetworkImageView poster;
 
         /**
          * Class constructor.
-         * @param view  layout of each item int the RecyclerView
+         *
+         * @param view layout of each item int the RecyclerView
          */
         CardViewHolder(View view) {
             super(view);
             this.cardView = (CardView) view.findViewById(R.id.card_view);
-            this.title = (TextView) view.findViewById(R.id.tvTitle);
-            this.year = (TextView) view.findViewById(R.id.tvYear);
+            this.name = (TextView) view.findViewById(R.id.groupName);
+            this.memberCount = (TextView) view.findViewById(R.id.groupMemberCount);
             this.poster = (NetworkImageView) view.findViewById(R.id.nivPoster);
         }
 
         /**
-         * append title text to Title:
-         * @param title String of Title of movie
+         * append name text to Title:
+         *
+         * @param name String of Title of movie
          */
-        void setTitle(String title) {
-            String t = "Title:\n" + title;
-            this.title.setText(t);
+        void setName(String name) {
+            String t = "Title:\n" + name;
+            this.name.setText(t);
         }
 
         /**
          * append year text to Release Year:
+         *
          * @param year String of year of release
          */
-        void setYear(String year) {
-            String y = "Release Year:\n" + year;
-            this.year.setText(y);
+        void setMemberCount(int memberCount, String who) {
+            String y = memberCount + " " + who + " are in this group";
+            this.memberCount.setText(y);
         }
 
         /**
          * Sends ImageRequest using volley using imageLoader and Cache.
          * This is pre-implemented feature of Volley to cache images for faster responses.
          * Check VolleySingleton class for more details.
-         * @param imageUrl URL to poster of the Movie
+         *
+         * @param imageUrl URL to poster of the Group
          */
-        void setPosterUrl(String imageUrl) {
+        void setPhotoUrl(String imageUrl) {
             ImageLoader imageLoader = VolleySingleton.getInstance(App.getContext()).getImageLoader();
             this.poster.setImageUrl(imageUrl, imageLoader);
         }
 
         /**
-         *
          * @param listener {@link OnClickListener}
-         * @param movie
+         * @param group
          */
-        void bindClickListener(final OnClickListener listener, final Movie movie){
+        void bindClickListener(final OnClickListener listener, final Group group) {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onCardClick(movie);
+                    listener.onCardClick(group);
                 }
             });
 
-            poster.setOnClickListener(new View.OnClickListener() {
+           /* poster.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onPosterClick(movie);
+                    listener.onPosterClick(group);
                 }
-            });
+            });*/
         }
     }
 }

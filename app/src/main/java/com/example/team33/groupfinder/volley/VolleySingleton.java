@@ -1,4 +1,4 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.volley;
 
 import android.content.Context;
 import android.graphics.Bitmap;

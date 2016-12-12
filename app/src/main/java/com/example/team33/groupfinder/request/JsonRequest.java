@@ -1,7 +1,8 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.request;
 
 /*
  * Created by abhijit on 12/2/16.
+ * Modified by Teng on 12/10/16.
  */
 
 import android.util.Log;
@@ -10,19 +11,20 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.team33.groupfinder.model.Group;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
 /**
- * Volley request to receive JSON as response and parse it to create list of movies
+ * Volley request to receive JSON as response and parse it to create list of groups
  */
-public class JsonRequest extends Request<List<Movie>> {
+public class JsonRequest extends Request<List<Group>> {
 
     // Success listener implemented in controller
-    private Response.Listener<List<Movie>> successListener;
+    private Response.Listener<List<Group>> successListener;
 
     /**
      * Class constructor
@@ -33,25 +35,25 @@ public class JsonRequest extends Request<List<Movie>> {
      */
     public JsonRequest( int method,
                         String url,
-                        Response.Listener<List<Movie>> successListener,
+                        Response.Listener<List<Group>> successListener,
                         Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         this.successListener = successListener;
     }
 
     @Override
-    protected Response<List<Movie>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<List<Group>> parseNetworkResponse(NetworkResponse response) {
         // Convert byte[] data received in the response to String
         String jsonString = new String(response.data);
-        List<Movie> movies;
-        JSONObject jsonObject;
+        List<Group> movies;
+        JSONArray jsonObject;
         Log.i(this.getClass().getName(), jsonString);
         // Try to convert JsonString to list of movies
         try {
             // Convert JsonString to JSONObject
-            jsonObject = new JSONObject(jsonString);
+            jsonObject = new JSONArray(jsonString);
             // Get list of movies from received JSON
-            movies = Movie.parseJson(jsonObject);
+            movies = Group.parseJson(jsonObject);
         }
         // in case of exception, return volley error
         catch (JSONException e) {
@@ -64,7 +66,7 @@ public class JsonRequest extends Request<List<Movie>> {
     }
 
     @Override
-    protected void deliverResponse(List<Movie> movies) {
+    protected void deliverResponse(List<Group> movies) {
         successListener.onResponse(movies);
     }
 }

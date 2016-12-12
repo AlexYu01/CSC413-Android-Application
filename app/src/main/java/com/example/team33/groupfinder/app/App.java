@@ -1,4 +1,4 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.app;
 
 import android.app.Application;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.content.Context;
 /**
  *  Created by abhijit on 12/2/16.
  *  Check AndroidManifest.xml under application
- *  android:name=".app.App"
+ *  android:name=".App"
  *  will setup this class as Singleton and will be instantiated when application starts
  */
 public class App extends Application {
