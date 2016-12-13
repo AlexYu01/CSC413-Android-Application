@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,9 @@ import com.example.team33.groupfinder.adapter.RecyclerViewAdapter;
 import com.example.team33.groupfinder.app.App;
 import com.example.team33.groupfinder.controller.JsonController;
 import com.example.team33.groupfinder.model.Group;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +41,23 @@ import android.location.LocationManager;
 public class MainActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        RecyclerViewAdapter.OnClickListener {
+        RecyclerViewAdapter.OnClickListener,GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     JsonController controller;
-    AppLocationService appLocationService;
-    Location gpsLocation;
+
+    //AppLocationService appLocationService;
+    //Location gpsLocation;
+
+    private GoogleApiClient googleApiClient;
+
     TextView textView;
     RecyclerView recyclerView;
-    double latitude;
-    double longitude;
+    private double latitude;
+    private double longitude;
     private RecyclerViewAdapter adapter;
+
+    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,42 +77,87 @@ public class MainActivity extends AppCompatActivity
         adapter.setListener(this);
 
         //TODO part of location tracker
-        if (!checkLocationPermission()) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-
-        appLocationService = new AppLocationService(
-                MainActivity.this);
-
-        // TODO note case: where access is already granted and GPS location is on
-        if (checkLocationPermission()) {
-            turnOnGPS();
-        }
 
 
-        controller = new JsonController(
-                new JsonController.OnResponseListener() {
-                    @Override
-                    public void onSuccess(List<Group> groups) {
-                        if (groups.size() > 0) {
-                            textView.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            recyclerView.invalidate();
-                            adapter.updateDataSet(groups);
-                            recyclerView.setAdapter(adapter);
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                PERMISSION_ACCESS_COARSE_LOCATION);
+    }
+        googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
+            //appLocationService = new AppLocationService(
+             //       MainActivity.this);
+
+            // TODO note case: where access is already granted and GPS location is on
+            //if (checkLocationPermission()) {
+             //   turnOnGPS();
+            //}
+
+
+            controller = new JsonController(
+                    new JsonController.OnResponseListener() {
+                        @Override
+                        public void onSuccess(List<Group> groups) {
+                            if (groups.size() > 0) {
+                                textView.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+                                recyclerView.invalidate();
+                                adapter.updateDataSet(groups);
+                                recyclerView.setAdapter(adapter);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        textView.setVisibility(View.VISIBLE);
-                        textView.setText("Failed to retrieve data");
-                        Toast.makeText(MainActivity.this, "Failed to retrieve data", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            textView.setVisibility(View.VISIBLE);
+                            textView.setText("Failed to retrieve data");
+                            Toast.makeText(MainActivity.this, "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
     }
 
     //TODO part of location tracker
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(MainActivity.class.getSimpleName(), "Connected to Google Play Services!");
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+             latitude = lastLocation.getLatitude();
+            longitude = lastLocation.getLongitude();
+            System.out.println(latitude + ""+ longitude);
+
+
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.i(MainActivity.class.getSimpleName(), "Can't connect to Google Play Services!");
+    }
 
     public void showSettingsAlert(String provider) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(
@@ -132,23 +189,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case 1: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // TODO note case: access was not yet granted and gps was on
-                    turnOnGPS();
-
+            case PERMISSION_ACCESS_COARSE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // All good!
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    Toast.makeText(this, "Need your location!", Toast.LENGTH_SHORT).show();
                 }
-                return;
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
+
+                break;
         }
     }
 
@@ -158,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         return (res == PackageManager.PERMISSION_GRANTED);
     }
 
-    public void turnOnGPS() {
+  /*  public void turnOnGPS() {
         gpsLocation = appLocationService
                 .getLocation(LocationManager.GPS_PROVIDER);
 
@@ -173,7 +223,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             showSettingsAlert("GPS");
         }
-    }
+    }*/
 
 
     /**
