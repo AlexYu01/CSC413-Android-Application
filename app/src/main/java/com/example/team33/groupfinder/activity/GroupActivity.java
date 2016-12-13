@@ -1,11 +1,13 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.activity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
+import com.example.team33.groupfinder.GroupFragment;
 
-public class GroupActivity extends SingleFragmentActivity{
+
+public class GroupActivity extends SingleFragmentActivity {
 
     private static final String EXTRA_STORY_ID = "story_id";
 

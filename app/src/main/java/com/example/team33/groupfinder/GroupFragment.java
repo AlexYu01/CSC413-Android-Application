@@ -22,6 +22,7 @@ public class GroupFragment extends Fragment {
     private EditText mNameField;
     private EditText mDescField;
 
+
     public static GroupFragment newInstance(String storyId) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_STORY_ID, storyId);

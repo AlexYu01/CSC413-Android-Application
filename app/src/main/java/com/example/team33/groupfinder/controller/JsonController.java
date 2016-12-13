@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.team33.groupfinder.activity.MainActivity;
 import com.example.team33.groupfinder.app.App;
 import com.example.team33.groupfinder.model.Group;
 import com.example.team33.groupfinder.request.JsonRequest;
@@ -23,6 +24,8 @@ import java.util.List;
 public class JsonController {
 
     private final int TAG = 100;
+
+    private final static String API_KEY = "5b3c326e1d47136f257c3d2c6828711e";
 
     private OnResponseListener responseListener;
 
@@ -44,10 +47,17 @@ public class JsonController {
         int method = Request.Method.GET;
 
         // Url with GET parameters
-        //TODO mod this later String url = "http://www.omdbapi.com/?s=" + Uri.encode(query) + "&t=movie";
-        // Currently using a default string
         System.out.println(latitude + " " + longitude);
-        String url = "https://api.meetup.com/find/groups?key=5b3c326e1d47136f257c3d2c6828711e&&sign=true&photo-host=public&lon="+ longitude +"&text=" + Uri.encode(query) + "&radius=5&lat="+latitude+"&order=distance&page=20";
+        String url;
+        if(latitude != -91.0 || longitude != -181.0) {
+            url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&lon="+ longitude +"&text=" + Uri.encode(query) + "&radius=5&lat="+latitude+"&order=distance&page=20";
+            System.out.println("with location url");
+        } else {
+            url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&text=" + Uri.encode(query) + "&radius=5&page=20";
+            System.out.println("locationless url");
+
+        }
+
         // Create new request using JsonRequest
         JsonRequest request
             = new JsonRequest(
@@ -84,7 +94,7 @@ public class JsonController {
 
     /**
      *  Interface to communicate between {@link android.app.Activity} and {@link JsonRequest}
-     *  <p>Object available in {@link JsonRequest} and implemented in {@link com.example.team33.groupfinder.MainActivity}</p>
+     *  <p>Object available in {@link JsonRequest} and implemented in {@link MainActivity}</p>
      */
     public interface OnResponseListener {
         void onSuccess(List<Group> groups);

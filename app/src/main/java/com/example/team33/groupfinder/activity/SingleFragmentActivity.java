@@ -1,9 +1,11 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+
+import com.example.team33.groupfinder.R;
 
 public abstract class SingleFragmentActivity extends FragmentActivity {
 

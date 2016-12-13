@@ -100,7 +100,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.cardView = (CardView) view.findViewById(R.id.card_view);
             this.name = (TextView) view.findViewById(R.id.groupName);
             this.memberCount = (TextView) view.findViewById(R.id.groupMemberCount);
-            this.poster = (NetworkImageView) view.findViewById(R.id.nivPoster);
+            this.poster = (NetworkImageView) view.findViewById(R.id.groupPhoto);
         }
 
         /**
@@ -109,8 +109,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          * @param name String of Title of movie
          */
         void setName(String name) {
-            String t = "Title:\n" + name;
-            this.name.setText(t);
+            this.name.setText(name);
         }
 
         /**
@@ -119,8 +118,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          * @param year String of year of release
          */
         void setMemberCount(int memberCount, String who) {
-            String y = memberCount + " " + who + " are in this group";
-            this.memberCount.setText(y);
+            String m = "We're " + memberCount + " " + who;
+            this.memberCount.setText(m);
         }
 
         /**

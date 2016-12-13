@@ -23,16 +23,8 @@ public class Group {
     private String mCity;
     private String mWho;
     private String mGroupPhotoUrl;
-
-    public int getMemberCount() {
-        return mMemberCount;
-    }
-
-    public void setMemberCount(int memberCount) {
-        mMemberCount = memberCount;
-    }
-
     private int mMemberCount;
+
     /**
      * <p>Class constructor</p>
      * <p>Sample Group JSONObject</p>
@@ -61,11 +53,20 @@ public class Group {
         if (jsonObject.has("who")) this.setWho(jsonObject.getString("who"));
         if (jsonObject.has("members")) this.setMemberCount(jsonObject.getInt("members"));
 
+        String imgUrl = null;
         if (jsonObject.has("group_photo")) {
             JSONObject innerObject = jsonObject.getJSONObject("group_photo");
-            if (innerObject.has("photo_link")) {
-                String imgUrl = innerObject.getString("photo_link");
+            if (innerObject.has("highres_link")) {
+                imgUrl = innerObject.getString("highres_link");
                 this.setGroupPhotoUrl(imgUrl);
+            }
+        } else if (imgUrl == null) {
+            if (jsonObject.has("key_photo")) {
+                JSONObject innerObject = jsonObject.getJSONObject("key_photo");
+                if (innerObject.has("highres_link")) {
+                    imgUrl = innerObject.getString("highres_link");
+                    this.setGroupPhotoUrl(imgUrl);
+                }
             }
         }
     }
@@ -88,6 +89,14 @@ public class Group {
         // }
 
         return groups;
+    }
+
+    public int getMemberCount() {
+        return mMemberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        mMemberCount = memberCount;
     }
 
     public String getDesc() {

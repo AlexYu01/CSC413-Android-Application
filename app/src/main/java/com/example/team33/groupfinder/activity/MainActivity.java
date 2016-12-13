@@ -1,4 +1,4 @@
-package com.example.team33.groupfinder;
+package com.example.team33.groupfinder.activity;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.team33.groupfinder.R;
 import com.example.team33.groupfinder.adapter.RecyclerViewAdapter;
 import com.example.team33.groupfinder.app.App;
 import com.example.team33.groupfinder.controller.JsonController;
@@ -35,29 +36,26 @@ import java.util.List;
 
 
 import android.location.Location;
-import android.location.LocationManager;
 
 
 public class MainActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        RecyclerViewAdapter.OnClickListener,GoogleApiClient.ConnectionCallbacks,
+        RecyclerViewAdapter.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
+
+
     JsonController controller;
-
-    //AppLocationService appLocationService;
-    //Location gpsLocation;
-
-    private GoogleApiClient googleApiClient;
-
     TextView textView;
     RecyclerView recyclerView;
     private double latitude;
     private double longitude;
     private RecyclerViewAdapter adapter;
+    private GoogleApiClient googleApiClient;
+    private Location mLastLocation;
 
-    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +64,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // set default latitude and longitude values that don't exist in real world
+        latitude = -91.0;
+        longitude = -181.0;
+
         textView = (TextView) findViewById(R.id.tvEmptyRecyclerView);
-        textView.setText("Search for groups using SearchView in toolbar");
+        textView.setText("Search for groups by pressing the magnifying glass on the toolbar");
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -76,56 +78,43 @@ public class MainActivity extends AppCompatActivity
         adapter = new RecyclerViewAdapter(new ArrayList<Group>());
         adapter.setListener(this);
 
-        //TODO part of location tracker
-
-
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                PERMISSION_ACCESS_COARSE_LOCATION);
-    }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_ACCESS_FINE_LOCATION);
+        }
+
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
-            //appLocationService = new AppLocationService(
-             //       MainActivity.this);
 
-            // TODO note case: where access is already granted and GPS location is on
-            //if (checkLocationPermission()) {
-             //   turnOnGPS();
-            //}
-
-
-            controller = new JsonController(
-                    new JsonController.OnResponseListener() {
-                        @Override
-                        public void onSuccess(List<Group> groups) {
-                            if (groups.size() > 0) {
-                                textView.setVisibility(View.GONE);
-                                recyclerView.setVisibility(View.VISIBLE);
-                                recyclerView.invalidate();
-                                adapter.updateDataSet(groups);
-                                recyclerView.setAdapter(adapter);
-                            }
+        controller = new JsonController(
+                new JsonController.OnResponseListener() {
+                    @Override
+                    public void onSuccess(List<Group> groups) {
+                        if (groups.size() > 0) {
+                            textView.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            recyclerView.invalidate();
+                            adapter.updateDataSet(groups);
+                            recyclerView.setAdapter(adapter);
                         }
+                    }
 
-                        @Override
-                        public void onFailure(String errorMessage) {
-                            textView.setVisibility(View.VISIBLE);
-                            textView.setText("Failed to retrieve data");
-                            Toast.makeText(MainActivity.this, "Failed to retrieve data", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText("Failed to retrieve data");
+                        Toast.makeText(MainActivity.this, "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    //TODO part of location tracker
-
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
         if (googleApiClient != null) {
             googleApiClient.connect();
         }
-    }
+    }*/
 
     @Override
     protected void onStop() {
@@ -135,17 +124,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.i(MainActivity.class.getSimpleName(), "Connected to Google Play Services!");
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        Log.i(MainActivity.class.getSimpleName(), "Connected to google play service!");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-             latitude = lastLocation.getLatitude();
-            longitude = lastLocation.getLongitude();
-            System.out.println(latitude + ""+ longitude);
-
-
+            Log.i(MainActivity.class.getSimpleName(), "Permission was granted!");
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (mLastLocation != null) {
+                Log.i(MainActivity.class.getSimpleName(), "Location is not null!");
+                latitude = mLastLocation.getLatitude();
+                longitude = mLastLocation.getLongitude();
+            }
         }
     }
 
@@ -157,6 +145,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(MainActivity.class.getSimpleName(), "Can't connect to Google Play Services!");
+    }
+
+    public void getLocation() {
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
     }
 
     public void showSettingsAlert(String provider) {
@@ -191,40 +185,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_ACCESS_COARSE_LOCATION:
+            case PERMISSION_ACCESS_FINE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // All good!
                 } else {
-                    Toast.makeText(this, "Need your location!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "We may not be able to provide you with the best results!", Toast.LENGTH_SHORT).show();
                 }
 
                 break;
         }
     }
-
-    public boolean checkLocationPermission() {
-        String permission = "android.permission.ACCESS_FINE_LOCATION";
-        int res = this.checkCallingOrSelfPermission(permission);
-        return (res == PackageManager.PERMISSION_GRANTED);
-    }
-
-  /*  public void turnOnGPS() {
-        gpsLocation = appLocationService
-                .getLocation(LocationManager.GPS_PROVIDER);
-
-        if (gpsLocation != null) {
-            latitude = gpsLocation.getLatitude();
-            longitude = gpsLocation.getLongitude();
-            Toast.makeText(
-                    getApplicationContext(),
-                    "Mobile Location (GPS): \nLatitude: " + latitude
-                            + "\nLongitude: " + longitude,
-                    Toast.LENGTH_LONG).show();
-        } else {
-            showSettingsAlert("GPS");
-        }
-    }*/
-
 
     /**
      * create options from menu/menu_activity_main.xml where we have searchView as one of the menu items
@@ -256,6 +226,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
+        getLocation();
+
         if (query.length() > 1) {
             controller.cancelAllRequests();
             //controller.sendRequest(query); //TODO modded
@@ -279,9 +251,15 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onQueryTextChange(String newText) {
+        getLocation();
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if (mLastLocation != null) {
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
+        }
         if (newText.length() > 1) {
             controller.cancelAllRequests();
-            //controller.sendRequest(newText); //TODO modded
             controller.sendRequest(newText, latitude, longitude);
         } else if (newText.equals("")) {
             recyclerView.setVisibility(View.GONE);
@@ -296,19 +274,9 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onCardClick(Group group) {
-        Toast.makeText(this, group.getName() + " clicked", Toast.LENGTH_SHORT).show();
+
         Intent intent = GroupActivity.newIntent(App.getContext(), group.getGroupId());
         startActivity(intent);
     }
 
-    /**
-     * Interface Implementation
-     * <p>This method will be invoked when user press on poster of the group</p>
-     */
-    /*@Override
-    public void onPosterClick(Group group) {
-        Toast.makeText(this, group.getName() + " poster clicked", Toast.LENGTH_SHORT).show();
-        Intent intent = GroupActivity.newIntent(App.getContext(), group.getGroupId());
-        startActivity(intent);
-    }*/
 }
