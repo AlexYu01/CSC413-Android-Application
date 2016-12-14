@@ -9,16 +9,15 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.example.team33.groupfinder.R;
 import com.example.team33.groupfinder.app.App;
 import com.example.team33.groupfinder.model.Group;
-import com.example.team33.groupfinder.R;
 import com.example.team33.groupfinder.volley.VolleySingleton;
 
 import java.util.List;
 
-/*
- * Created by abhijit on 11/20/16.
- * Modified by Teng on 12/11/16
+/**
+ * Created by Teng on 12/11/16
  */
 
 
@@ -29,6 +28,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public RecyclerViewAdapter(List<Group> groupList) {
         this.mGroupList = groupList;
+    }
+
+    public static List<Group> getGroupList() {
+        return mGroupList;
     }
 
     @Override
@@ -54,10 +57,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemCount() {
         return mGroupList.size();
-    }
-
-    public static List<Group> getGroupList() {
-        return mGroupList;
     }
 
     /**
@@ -105,19 +104,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         /**
-         * append name text to Title:
-         *
-         * @param name String of Title of movie
+         * @param name String of group name
          */
         void setName(String name) {
             this.name.setText(name);
         }
 
         /**
-         * append year text to Release Year:
+         * append memberCount and who
          *
          * @param memberCount int number of members in the group
-         * @param who String of what the group considers themselves
+         * @param who         String of what the group considers themselves
          */
         void setMemberCount(int memberCount, String who) {
             String m = "We're " + memberCount + " " + who;

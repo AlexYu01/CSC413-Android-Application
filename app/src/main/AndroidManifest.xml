@@ -26,6 +26,7 @@
         <activity android:name=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".activity.GroupActivity"/>
+        <activity android:name=".activity.WebActivity"/>
     </application>
 
 </manifest>

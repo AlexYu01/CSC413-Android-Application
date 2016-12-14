@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/*
+/**
  * Created by Teng on 12/10/16.
  */
 
@@ -28,6 +28,7 @@ public class Group {
     private String mState;
     private String mWho;
     private String mGroupPhotoUrl;
+    private String mGroupWebUrl;
     private int mMemberCount;
 
     /**
@@ -59,6 +60,7 @@ public class Group {
         if (jsonObject.has("state")) this.setState(jsonObject.getString("state"));
         if (jsonObject.has("who")) this.setWho(jsonObject.getString("who"));
         if (jsonObject.has("members")) this.setMemberCount(jsonObject.getInt("members"));
+        if (jsonObject.has("link")) this.setGroupWebUrl(jsonObject.getString("link"));
 
         String imgUrl = null;
         if (jsonObject.has("group_photo")) {
@@ -76,6 +78,7 @@ public class Group {
                 }
             }
         }
+
     }
 
     /**
@@ -92,6 +95,14 @@ public class Group {
         }
 
         return groups;
+    }
+
+    public String getGroupWebUrl() {
+        return mGroupWebUrl;
+    }
+
+    public void setGroupWebUrl(String groupWebUrl) {
+        mGroupWebUrl = groupWebUrl;
     }
 
     public String getState() {

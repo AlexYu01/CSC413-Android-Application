@@ -4,10 +4,10 @@ import android.app.Application;
 import android.content.Context;
 
 /**
- *  Created by abhijit on 12/2/16.
- *  Check AndroidManifest.xml under application
- *  android:name=".App"
- *  will setup this class as Singleton and will be instantiated when application starts
+ * Created by abhijit on 12/2/16.
+ * Check AndroidManifest.xml under application
+ * android:name=".App"
+ * will setup this class as Singleton and will be instantiated when application starts
  */
 public class App extends Application {
 
@@ -15,10 +15,11 @@ public class App extends Application {
 
     /**
      * Return application context anywhere in the application
-     * @return  Application context
+     *
+     * @return Application context
      */
-    public static Context getContext(){
-         return instance.getApplicationContext();
+    public static Context getContext() {
+        return instance.getApplicationContext();
     }
 
     @Override

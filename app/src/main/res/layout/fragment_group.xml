@@ -9,8 +9,7 @@
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/groupPhoto"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-
+        android:layout_height="170dp"
         android:src="@drawable/loader"/>
 
 
@@ -18,86 +17,84 @@
         android:id="@+id/groupName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:textSize="24sp"
-        android:paddingTop="24dp"
-        android:paddingBottom="16dp"
-        android:paddingRight="16dp"
-        android:paddingLeft="16dp"
-
-        android:scrollHorizontally="true"
         android:maxLines="2"
-
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="24dp"
+        android:scrollHorizontally="true"
+        android:text="@string/group_name"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         android:textColor="@color/colorText"
-        android:text="@string/group_name" />
+        android:textSize="24sp"/>
+
+    <View style="@style/Divider"/>
 
     <TextView
         android:id="@+id/groupMemberCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingBottom="16dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-
-        android:ellipsize="end"
-        android:maxLines="1"
-
+        android:text="@string/member_count"
         android:textColor="@color/colorText"
-
-        android:text="@string/member_count" />
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/groupId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingBottom="16dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-
-        android:ellipsize="end"
-        android:maxLines="1"
-
+        android:text="@string/group_id"
         android:textColor="@color/colorText"
-
-        android:text="@string/group_id" />
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/groupLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingBottom="16dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-
-        android:ellipsize="end"
-        android:maxLines="1"
-
+        android:text="@string/group_city"
         android:textColor="@color/colorText"
+        android:textSize="14sp"/>
 
-        android:text="@string/group_city" />
+    <View style="@style/Divider"/>
+
+    <Button
+        android:id="@+id/groupWebButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorText"
+        android:text="@string/view_in_web"/>
+
+    <View style="@style/Divider"/>
 
     <TextView
         android:id="@+id/groupDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:textSize="14sp"
-        android:paddingTop="16dp"
         android:paddingBottom="24dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-
+        android:paddingTop="16dp"
         android:scrollbars="vertical"
-
+        android:text="@string/group_description"
         android:textColor="@color/colorText"
-
-        android:text="@string/group_description" />
+        android:textSize="14sp"/>
 
 </LinearLayout>

@@ -1,8 +1,7 @@
 package com.example.team33.groupfinder.request;
 
-/*
- * Created by abhijit on 12/2/16.
- * Modified by Teng on 12/10/16.
+/**
+ * Created by Teng on 12/10/16.
  */
 
 import android.util.Log;
@@ -28,15 +27,16 @@ public class JsonRequest extends Request<List<Group>> {
 
     /**
      * Class constructor
-     * @param method            Request method
-     * @param url               url to API
-     * @param successListener   success listener
-     * @param errorListener     failure listener
+     *
+     * @param method          Request method
+     * @param url             url to API
+     * @param successListener success listener
+     * @param errorListener   failure listener
      */
-    public JsonRequest( int method,
-                        String url,
-                        Response.Listener<List<Group>> successListener,
-                        Response.ErrorListener errorListener) {
+    public JsonRequest(int method,
+                       String url,
+                       Response.Listener<List<Group>> successListener,
+                       Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         this.successListener = successListener;
     }

@@ -13,9 +13,8 @@ import com.example.team33.groupfinder.volley.VolleySingleton;
 
 import java.util.List;
 
-/*
- * Created by abhijit on 12/2/16.
- * Modified by Teng on 12/10/16.
+/**
+ * Created by Teng on 12/10/16.
  */
 
 /**
@@ -48,7 +47,6 @@ public class JsonController {
         int method = Request.Method.GET;
 
         // Url with GET parameters
-        System.out.println(latitude + " " + longitude);
         String url;
         if (latitude != -91.0 || longitude != -181.0) {
             url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&lon=" + longitude + "&text=" + Uri.encode(query) + "&radius=5&lat=" + latitude + "&order=distance&page=20";

@@ -7,5 +7,6 @@
     <string name="group_description">Group Description</string>
     <string name="search_guide">Search for groups by pressing the magnifying glass on the toolbar</string>
     <string name="location_permission_denied">We may not be able to provide you with the best results!</string>
+    <string name="view_in_web">View In Web</string>
 
 </resources>

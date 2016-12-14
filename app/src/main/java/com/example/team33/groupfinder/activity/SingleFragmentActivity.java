@@ -7,6 +7,10 @@ import android.support.v4.app.FragmentManager;
 
 import com.example.team33.groupfinder.R;
 
+/**
+ * Created by Teng on 12/10/16.
+ */
+
 public abstract class SingleFragmentActivity extends FragmentActivity {
 
     protected abstract Fragment createFragment();

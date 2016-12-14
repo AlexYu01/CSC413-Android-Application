@@ -1,18 +1,19 @@
 package com.example.team33.groupfinder.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.team33.groupfinder.R;
-import com.example.team33.groupfinder.activity.MainActivity;
+import com.example.team33.groupfinder.activity.WebActivity;
 import com.example.team33.groupfinder.adapter.RecyclerViewAdapter;
 import com.example.team33.groupfinder.app.App;
 import com.example.team33.groupfinder.model.Group;
@@ -20,7 +21,7 @@ import com.example.team33.groupfinder.volley.VolleySingleton;
 
 import java.util.UUID;
 
-/*
+/**
  * Created by Teng on 12/11/16.
  */
 
@@ -36,6 +37,7 @@ public class GroupFragment extends Fragment {
     private TextView mGroupId;
     private TextView mGroupLocation;
     private TextView mGroupDesc;
+    private Button mWebButton;
 
 
     public static GroupFragment newInstance(UUID groupUuid) {
@@ -50,9 +52,8 @@ public class GroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UUID groupUuid = (UUID) getArguments().getSerializable(ARG_GROUP_ID);
-        Log.i(MainActivity.class.getSimpleName(), "On create ID: " + groupUuid);
         for (Group group : RecyclerViewAdapter.getGroupList()) {
-            if(group.getUuid().equals(groupUuid)) {
+            if (group.getUuid().equals(groupUuid)) {
                 mGroup = group;
             }
         }
@@ -61,7 +62,7 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_story, container, false);
+        View v = inflater.inflate(R.layout.fragment_group, container, false);
 
         mGroupPhoto = (NetworkImageView) v.findViewById(R.id.groupPhoto);
         mGroupName = (TextView) v.findViewById((R.id.groupName));
@@ -78,7 +79,17 @@ public class GroupFragment extends Fragment {
         mGroupDesc.setText(mGroup.getDesc());
         mGroupDesc.setMovementMethod(new ScrollingMovementMethod());
 
-        return  v;
+
+        mWebButton = (Button) v.findViewById(R.id.groupWebButton);
+        mWebButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = WebActivity.newIntent(App.getContext(), mGroup.getGroupWebUrl());
+                startActivity(intent);
+            }
+        });
+
+        return v;
     }
 
     void setPhotoUrl(String imageUrl) {
