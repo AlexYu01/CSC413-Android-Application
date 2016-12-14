@@ -39,9 +39,9 @@
         android:id="@+id/tvEmptyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="No results found"
+        android:text="@string/no_results_found"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/colorText"
+        android:textColor="@color/colorSecondaryText"
         android:gravity="center"
         android:layout_below="@+id/action_bar" />
 

@@ -52,7 +52,7 @@
                 android:maxLines="1"
 
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                android:textColor="@color/colorText"
+                android:textColor="@color/colorPrimaryText"
                 android:text="@string/group_name" />
 
             <TextView
@@ -68,7 +68,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
 
-                android:textColor="@color/colorText"
+                android:textColor="@color/colorSecondaryText"
                 android:layout_below="@id/groupName"
 
                 android:text="@string/member_count" />

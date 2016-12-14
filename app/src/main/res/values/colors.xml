@@ -3,7 +3,10 @@
     <color name="colorPrimary">#3E50B4</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF3F80</color>
-    <color name="colorText">#FFFFFF</color>
+    <color name="colorPrimaryText">#FFFFFF</color>
+    <color name="colorSecondaryText">#B3FFFFFF</color>
+    <color name="colorHintText">#80FFFFFF</color>
+    <color name="colorDivider">#1FFFFFFF</color>
     <color name="colorSplashScreen">#424242</color>
 
     <color name="status_bar">#000000</color>
