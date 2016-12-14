@@ -18,7 +18,9 @@ import java.util.List;
 
 /*
  * Created by abhijit on 11/20/16.
+ * Modified by Teng on 12/11/16
  */
+
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -77,7 +79,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public interface OnClickListener {
         void onCardClick(Group group);
 
-        //void onPosterClick(Group group);
     }
 
     /**
@@ -88,7 +89,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private CardView cardView;
         private TextView name;
         private TextView memberCount;
-        private NetworkImageView poster;
+        private NetworkImageView groupPhoto;
 
         /**
          * Class constructor.
@@ -100,7 +101,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.cardView = (CardView) view.findViewById(R.id.card_view);
             this.name = (TextView) view.findViewById(R.id.groupName);
             this.memberCount = (TextView) view.findViewById(R.id.groupMemberCount);
-            this.poster = (NetworkImageView) view.findViewById(R.id.groupPhoto);
+            this.groupPhoto = (NetworkImageView) view.findViewById(R.id.groupPhoto);
         }
 
         /**
@@ -115,7 +116,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         /**
          * append year text to Release Year:
          *
-         * @param year String of year of release
+         * @param memberCount int number of members in the group
+         * @param who String of what the group considers themselves
          */
         void setMemberCount(int memberCount, String who) {
             String m = "We're " + memberCount + " " + who;
@@ -127,11 +129,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          * This is pre-implemented feature of Volley to cache images for faster responses.
          * Check VolleySingleton class for more details.
          *
-         * @param imageUrl URL to poster of the Group
+         * @param imageUrl URL to groupPhoto of the Group
          */
         void setPhotoUrl(String imageUrl) {
             ImageLoader imageLoader = VolleySingleton.getInstance(App.getContext()).getImageLoader();
-            this.poster.setImageUrl(imageUrl, imageLoader);
+            this.groupPhoto.setImageUrl(imageUrl, imageLoader);
         }
 
         /**
@@ -143,15 +145,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View view) {
                     listener.onCardClick(group);
+
                 }
             });
-
-           /* poster.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onPosterClick(group);
-                }
-            });*/
         }
     }
 }

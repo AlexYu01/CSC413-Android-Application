@@ -23,15 +23,12 @@ import java.util.List;
  */
 public class JsonController {
 
-    private final int TAG = 100;
-
     private final static String API_KEY = "5b3c326e1d47136f257c3d2c6828711e";
-
+    private final int TAG = 100;
     private OnResponseListener responseListener;
 
     /**
-     *
-     * @param responseListener  {@link OnResponseListener}
+     * @param responseListener {@link OnResponseListener}
      */
     public JsonController(OnResponseListener responseListener) {
         this.responseListener = responseListener;
@@ -39,9 +36,13 @@ public class JsonController {
 
     /**
      * Adds request to volley request queue
-     * @param query query term for search
+     * Determines what kind of query is sent depending on whether the app has valid location values
+     *
+     * @param query     query term for search
+     * @param latitude  double latitude location
+     * @param longitude double longitude location
      */
-    public void sendRequest(String query, double latitude, double longitude){
+    public void sendRequest(String query, double latitude, double longitude) {
 
         // Request Method
         int method = Request.Method.GET;
@@ -49,18 +50,17 @@ public class JsonController {
         // Url with GET parameters
         System.out.println(latitude + " " + longitude);
         String url;
-        if(latitude != -91.0 || longitude != -181.0) {
-            url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&lon="+ longitude +"&text=" + Uri.encode(query) + "&radius=5&lat="+latitude+"&order=distance&page=20";
-            System.out.println("with location url");
+        if (latitude != -91.0 || longitude != -181.0) {
+            url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&lon=" + longitude + "&text=" + Uri.encode(query) + "&radius=5&lat=" + latitude + "&order=distance&page=20";
+
         } else {
             url = "https://api.meetup.com/find/groups?key=" + API_KEY + "&&sign=true&photo-host=public&text=" + Uri.encode(query) + "&radius=5&page=20";
-            System.out.println("locationless url");
 
         }
 
         // Create new request using JsonRequest
         JsonRequest request
-            = new JsonRequest(
+                = new JsonRequest(
                 method,
                 url,
                 new Response.Listener<List<Group>>() {
@@ -93,11 +93,12 @@ public class JsonController {
     }
 
     /**
-     *  Interface to communicate between {@link android.app.Activity} and {@link JsonRequest}
-     *  <p>Object available in {@link JsonRequest} and implemented in {@link MainActivity}</p>
+     * Interface to communicate between {@link android.app.Activity} and {@link JsonRequest}
+     * <p>Object available in {@link JsonRequest} and implemented in {@link MainActivity}</p>
      */
     public interface OnResponseListener {
         void onSuccess(List<Group> groups);
+
         void onFailure(String errorMessage);
     }
 

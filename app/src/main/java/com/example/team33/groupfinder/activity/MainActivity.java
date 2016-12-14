@@ -1,15 +1,13 @@
 package com.example.team33.groupfinder.activity;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +27,14 @@ import com.example.team33.groupfinder.controller.JsonController;
 import com.example.team33.groupfinder.model.Group;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +49,9 @@ public class MainActivity extends AppCompatActivity
         RecyclerViewAdapter.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    protected static final String TAG = "MainActivity";
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
-
-
     JsonController controller;
     TextView textView;
     RecyclerView recyclerView;
@@ -54,8 +59,6 @@ public class MainActivity extends AppCompatActivity
     private double longitude;
     private RecyclerViewAdapter adapter;
     private GoogleApiClient googleApiClient;
-    private Location mLastLocation;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         longitude = -181.0;
 
         textView = (TextView) findViewById(R.id.tvEmptyRecyclerView);
-        textView.setText("Search for groups by pressing the magnifying glass on the toolbar");
+        textView.setText(R.string.search_guide);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -78,13 +81,17 @@ public class MainActivity extends AppCompatActivity
         adapter = new RecyclerViewAdapter(new ArrayList<Group>());
         adapter.setListener(this);
 
+        // ask user to allow location tracking
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_ACCESS_FINE_LOCATION);
         }
 
+        // build the Google API client
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
+
+        showSettingsAlert();
 
         controller = new JsonController(
                 new JsonController.OnResponseListener() {
@@ -108,14 +115,6 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    /*@Override
-    protected void onStart() {
-        super.onStart();
-        if (googleApiClient != null) {
-            googleApiClient.connect();
-        }
-    }*/
-
     @Override
     protected void onStop() {
         googleApiClient.disconnect();
@@ -124,17 +123,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.i(MainActivity.class.getSimpleName(), "Connected to google play service!");
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.i(MainActivity.class.getSimpleName(), "Permission was granted!");
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (mLastLocation != null) {
-                Log.i(MainActivity.class.getSimpleName(), "Location is not null!");
-                latitude = mLastLocation.getLatitude();
-                longitude = mLastLocation.getLongitude();
-            }
-        }
+        Log.i(MainActivity.class.getSimpleName(), "Connected to Google Play Services!");
     }
 
     @Override
@@ -147,40 +136,74 @@ public class MainActivity extends AppCompatActivity
         Log.i(MainActivity.class.getSimpleName(), "Can't connect to Google Play Services!");
     }
 
+    /**
+     * Connect to Google Play Services if not already.
+     * Check if permission to track location was granted. If so get last recorded location.
+     */
+
     public void getLocation() {
         if (googleApiClient != null) {
             googleApiClient.connect();
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                //Log.i(MainActivity.class.getSimpleName(), "Permission was granted!");
+                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                if (lastLocation != null) {
+                    //Log.i(MainActivity.class.getSimpleName(), "Location is not null!");
+                    latitude = lastLocation.getLatitude();
+                    longitude = lastLocation.getLongitude();
+                }
+            }
         }
     }
 
-    public void showSettingsAlert(String provider) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
-                MainActivity.this);
+    /**
+     * Use Google Services API to check if location on device is on and prompt the user if it is not
+     */
+    public void showSettingsAlert() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000 / 2);
 
-        alertDialog.setTitle(provider + " SETTINGS");
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
 
-        alertDialog
-                .setMessage(provider + " is not enabled! Want to go to settings menu?");
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        Log.i(TAG, "All location settings are satisfied.");
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
 
-        alertDialog.setPositiveButton("Settings",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        MainActivity.this.startActivity(intent);
-                    }
-                });
-
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-
-                });
-
-        alertDialog.show();
+                        try {
+                            // Show the dialog by calling startResolutionForResult(), and check the result
+                            // in onActivityResult().
+                            status.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.i(TAG, "PendingIntent unable to execute request.");
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
+                        break;
+                }
+            }
+        });
     }
+
+    /**
+     * Check the result of whether user allowed permission to track location
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -189,7 +212,7 @@ public class MainActivity extends AppCompatActivity
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // All good!
                 } else {
-                    Toast.makeText(this, "We may not be able to provide you with the best results!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.location_permission_denied, Toast.LENGTH_SHORT).show();
                 }
 
                 break;
@@ -226,11 +249,11 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
+
         getLocation();
 
         if (query.length() > 1) {
             controller.cancelAllRequests();
-            //controller.sendRequest(query); //TODO modded
             controller.sendRequest(query, latitude, longitude);
 
             return false;
@@ -251,13 +274,9 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public boolean onQueryTextChange(String newText) {
+
         getLocation();
 
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        if (mLastLocation != null) {
-            latitude = mLastLocation.getLatitude();
-            longitude = mLastLocation.getLongitude();
-        }
         if (newText.length() > 1) {
             controller.cancelAllRequests();
             controller.sendRequest(newText, latitude, longitude);
@@ -274,8 +293,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onCardClick(Group group) {
-
-        Intent intent = GroupActivity.newIntent(App.getContext(), group.getGroupId());
+        Intent intent = GroupActivity.newIntent(App.getContext(), group.getUuid());
         startActivity(intent);
     }
 

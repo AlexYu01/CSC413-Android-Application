@@ -46,14 +46,15 @@ public class JsonRequest extends Request<List<Group>> {
         // Convert byte[] data received in the response to String
         String jsonString = new String(response.data);
         List<Group> movies;
-        JSONArray jsonObject;
+
+        JSONArray jsonArray;
         Log.i(this.getClass().getName(), jsonString);
         // Try to convert JsonString to list of movies
         try {
-            // Convert JsonString to JSONObject
-            jsonObject = new JSONArray(jsonString);
+            // Convert JsonString to JSONArray
+            jsonArray = new JSONArray(jsonString);
             // Get list of movies from received JSON
-            movies = Group.parseJson(jsonObject);
+            movies = Group.parseJson(jsonArray);
         }
         // in case of exception, return volley error
         catch (JSONException e) {

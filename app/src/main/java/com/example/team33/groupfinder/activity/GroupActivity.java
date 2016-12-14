@@ -3,23 +3,37 @@ package com.example.team33.groupfinder.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
-import com.example.team33.groupfinder.GroupFragment;
+import com.example.team33.groupfinder.fragment.GroupFragment;
 
+import java.util.UUID;
+
+/*
+ * Created by Teng on 12/10/16.
+ */
 
 public class GroupActivity extends SingleFragmentActivity {
 
-    private static final String EXTRA_STORY_ID = "story_id";
+    private static final String EXTRA_GROUP_ID = "group_id";
 
-    public static Intent newIntent(Context packageContext, String groupId) {
+    /**
+     * @param packageContext Context of app
+     * @param groupId        UUID id associated with the card
+     * @return intent
+     */
+
+    public static Intent newIntent(Context packageContext, UUID groupId) {
+        Log.i(MainActivity.class.getSimpleName(), "Intent " + groupId);
         Intent intent = new Intent(packageContext, GroupActivity.class);
-        intent.putExtra(EXTRA_STORY_ID, groupId);
+        intent.putExtra(EXTRA_GROUP_ID, groupId);
         return intent;
     }
 
     @Override
     protected Fragment createFragment() {
-        String storyId = (String) getIntent().getSerializableExtra(EXTRA_STORY_ID);
+        UUID storyId = (UUID) getIntent().getSerializableExtra(EXTRA_GROUP_ID);
+        Log.i(MainActivity.class.getSimpleName(), "Create Fragment ID " + storyId);
         return GroupFragment.newInstance(storyId);
     }
 }

@@ -1,11 +1,14 @@
 package com.example.team33.groupfinder.model;
 
+import android.text.Html;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /*
  * Created by Teng on 12/10/16.
@@ -17,10 +20,12 @@ import java.util.List;
  */
 public class Group {
 
+    private UUID mId;
     private String mGroupId;
     private String mName;
     private String mDesc;
     private String mCity;
+    private String mState;
     private String mWho;
     private String mGroupPhotoUrl;
     private int mMemberCount;
@@ -46,10 +51,12 @@ public class Group {
      * @throws JSONException when parser fails to parse the given JSON
      */
     private Group(JSONObject jsonObject) throws JSONException {
+        mId = UUID.randomUUID();
         if (jsonObject.has("id")) this.setGroupId(jsonObject.getString("id"));
         if (jsonObject.has("name")) this.setName(jsonObject.getString("name"));
         if (jsonObject.has("description")) this.setDesc(jsonObject.getString("description"));
         if (jsonObject.has("city")) this.setCity(jsonObject.getString("city"));
+        if (jsonObject.has("state")) this.setState(jsonObject.getString("state"));
         if (jsonObject.has("who")) this.setWho(jsonObject.getString("who"));
         if (jsonObject.has("members")) this.setMemberCount(jsonObject.getInt("members"));
 
@@ -57,14 +64,14 @@ public class Group {
         if (jsonObject.has("group_photo")) {
             JSONObject innerObject = jsonObject.getJSONObject("group_photo");
             if (innerObject.has("highres_link")) {
-                imgUrl = innerObject.getString("highres_link");
+                imgUrl = innerObject.getString("photo_link");
                 this.setGroupPhotoUrl(imgUrl);
             }
         } else if (imgUrl == null) {
             if (jsonObject.has("key_photo")) {
                 JSONObject innerObject = jsonObject.getJSONObject("key_photo");
                 if (innerObject.has("highres_link")) {
-                    imgUrl = innerObject.getString("highres_link");
+                    imgUrl = innerObject.getString("photo_link");
                     this.setGroupPhotoUrl(imgUrl);
                 }
             }
@@ -72,23 +79,27 @@ public class Group {
     }
 
     /**
-     * @param jsonObject {@link JSONObject} response, received in Volley success listener
+     * @param jsonArray {@link JSONArray} response, received in Volley success listener
      * @return list of groups
      * @throws JSONException
      */
-    public static List<Group> parseJson(JSONArray jsonObject) throws JSONException {
+    public static List<Group> parseJson(JSONArray jsonArray) throws JSONException {
         List<Group> groups = new ArrayList<>();
-        // Check if the JSONObject has object with key "Search"
-        //if(jsonObject.has(":")){
-        // Get JSONArray from JSONObject
-        //JSONArray jsonArray = jsonObject.getJSONArray("");
-        for (int i = 0; i < jsonObject.length(); i++) {
+
+        for (int i = 0; i < jsonArray.length(); i++) {
             // Create new Group object from each JSONObject in the JSONArray
-            groups.add(new Group(jsonObject.getJSONObject(i)));
+            groups.add(new Group(jsonArray.getJSONObject(i)));
         }
-        // }
 
         return groups;
+    }
+
+    public String getState() {
+        return mState;
+    }
+
+    public void setState(String state) {
+        mState = state;
     }
 
     public int getMemberCount() {
@@ -99,12 +110,16 @@ public class Group {
         mMemberCount = memberCount;
     }
 
+    public UUID getUuid() {
+        return mId;
+    }
+
     public String getDesc() {
         return mDesc;
     }
 
     public void setDesc(String desc) {
-        mDesc = desc;
+        mDesc = stripHtml(desc);
     }
 
     public String getName() {
@@ -145,5 +160,23 @@ public class Group {
 
     public void setGroupPhotoUrl(String groupPhotoUrl) {
         this.mGroupPhotoUrl = groupPhotoUrl;
+    }
+
+    /**
+     * Removes html tags from description string
+     *
+     * @param html String a string with html tags
+     * @return String without html tags
+     */
+
+    private String stripHtml(String html) {
+        String s;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            s = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString();
+        } else {
+            s = Html.fromHtml(html).toString();
+        }
+
+        return s;
     }
 }

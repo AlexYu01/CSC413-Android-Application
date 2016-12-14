@@ -1,8 +1,8 @@
 #Project-2 Story Finder Finale
 #### Team Number
-TODO - Add your team number here.(Look into Piazza for details)
+33
 #### Team Members
-TODO - Add your team member names here.
+Teng Yu
 #### Youtube video Link
 TODO - Add your team's unlisted youtube video link here.
 
