@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -90,6 +92,16 @@
 
         <View style="@style/Divider"/>
 
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            card_view:cardCornerRadius="4dp"
+            android:padding="4dp" >
+
         <TextView
             android:id="@+id/groupDesc"
             android:layout_width="wrap_content"
@@ -101,6 +113,8 @@
             android:text="@string/group_description"
             android:textColor="@color/colorSecondaryText"
             android:textSize="14sp"/>
+    </android.support.v7.widget.CardView>
 
     </LinearLayout>
+
 </ScrollView>

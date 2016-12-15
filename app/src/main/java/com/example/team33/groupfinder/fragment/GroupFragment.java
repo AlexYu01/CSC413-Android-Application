@@ -76,7 +76,7 @@ public class GroupFragment extends Fragment {
         setMemberCount(mGroup.getMemberCount(), mGroup.getWho());
         setGroupId(mGroup.getGroupId());
         setGroupLocation(mGroup.getCity(), mGroup.getState());
-        mGroupDesc.setText(mGroup.getDesc());
+        setGroupDesc(mGroup.getDesc());
         mGroupDesc.setMovementMethod(new ScrollingMovementMethod());
 
 
@@ -105,6 +105,11 @@ public class GroupFragment extends Fragment {
     private void setGroupId(String id) {
         String i = "Group ID: " + id;
         this.mGroupId.setText(i);
+    }
+
+    private void setGroupDesc(String desc) {
+        String d = "Group Description: \n" + desc;
+        this.mGroupDesc.setText(d);
     }
 
     private void setGroupLocation(String city, String state) {
