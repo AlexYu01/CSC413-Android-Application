@@ -87,6 +87,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/button_design"
+            android:elevation="2dp"
             android:padding="8dp"
             android:text="@string/view_in_web"
             android:textColor="@color/colorSecondaryText"/>

@@ -50,16 +50,19 @@ public class MainActivity extends AppCompatActivity
         RecyclerViewAdapter.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+
     protected static final String TAG = "MainActivity";
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
-    JsonController controller;
-    TextView textView;
-    RecyclerView recyclerView;
     private double latitude;
     private double longitude;
     private RecyclerViewAdapter adapter;
     private GoogleApiClient googleApiClient;
+    LocationSettingsRequest.Builder builder;
+
+    JsonController controller;
+    TextView textView;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,17 @@ public class MainActivity extends AppCompatActivity
         // build the Google API client
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
 
+        googleApiClient.connect();
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000 / 2);
+
+        builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        // prompt user to enable Location on their device if it is off
         showSettingsAlert();
 
         controller = new JsonController(
@@ -117,6 +131,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+    @Override
     protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
@@ -138,37 +159,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Connect to Google Play Services if not already.
      * Check if permission to track location was granted. If so get last recorded location.
      */
 
     public void getLocation() {
-        if (googleApiClient != null) {
-            googleApiClient.connect();
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                //Log.i(MainActivity.class.getSimpleName(), "Permission was granted!");
                 Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (lastLocation != null) {
-                    //Log.i(MainActivity.class.getSimpleName(), "Location is not null!");
                     latitude = lastLocation.getLatitude();
                     longitude = lastLocation.getLongitude();
                 }
             }
-        }
     }
 
     /**
      * Use Google Services API to check if location on device is on and prompt the user if it is not
      */
     public void showSettingsAlert() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000 / 2);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
 
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
