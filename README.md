@@ -1,11 +1,4 @@
 #Project-2 Story Finder Finale
-#### Team Number
-33
-#### Team Members
-Teng Yu
-#### Youtube video Link
-
-https://youtu.be/3E3fwarMMzE
 
 ## Problem statement:
 You are to build on your project1 by adding real world functionality into your app. You must query an appropriate API, and populate cards. By default, you must work with the Meetup API. But you can decide to use any other API after asking on Piazza(IMDB,etc)
