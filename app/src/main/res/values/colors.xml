@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3E50B4</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF3F80</color>
+    <color name="colorPrimaryText">#FFFFFF</color>
+    <color name="colorSecondaryText">#B3FFFFFF</color>
+    <color name="colorHintText">#80FFFFFF</color>
+    <color name="colorDivider">#1FFFFFFF</color>
+    <color name="colorSplashScreen">#424242</color>
+
+    <color name="status_bar">#000000</color>
+    <color name="app_bar">#212121</color>
+    <color name="background">#303030</color>
+    <color name="colorCardBackground">#424242</color>
+
+    <color name="cards">#F1F0FF</color>
+
+</resources>
